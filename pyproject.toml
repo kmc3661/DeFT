@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deft-vlm"
+version = "0.1.0"
+description = "DeFT: Deferred Text-guided Pruning for vision-language models"
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+license = {file = "LICENSE"}
+dependencies = [
+  "torch>=2.6,<3", "transformers==4.57.3", "accelerate==1.12.0",
+  "numpy==1.26.4", "datasets==4.4.1", "qwen-vl-utils==0.0.14",
+  "lmms-eval==0.5.0", "pandas", "Pillow", "tqdm", "decord", "loguru"
+]
+
+[project.optional-dependencies]
+eval = ["pycocoevalcap", "nltk"]
+test = ["pytest"]
+
+[project.scripts]
+deft-eval = "deft.evaluate:main"
+deft-infer = "deft.infer:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"*" = ["*.cpp", "*.cc", "*.cu", "*.h"]
+
+[tool.setuptools.data-files]
+"share/deft/licenses" = ["licenses/lmms-eval-LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

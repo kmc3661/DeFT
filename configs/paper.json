@@ -1,0 +1,20 @@
+{
+  "method": "DeFT",
+  "default_alpha": 0.2,
+  "pruning_ratios": [0.7, 0.8, 0.9],
+  "alpha_sweep_p80": [0.1, 0.15, 0.2, 0.25, 0.3],
+  "alpha_0_3_results": "pending at packaging time",
+  "selection_depth": 0.5,
+  "decoder_blocks_in_paper": 36,
+  "min_pixels": 200704,
+  "max_pixels": 1605632,
+  "batch_size": 1,
+  "use_cache": false,
+  "do_sample": false,
+  "caption_prompt": "Output only a concise caption of at most 12 words for the image.",
+  "qwen_performance_backend": "flash_attention_2",
+  "ov_performance_backend": "sdpa",
+  "latency_backend": "sdpa",
+  "latency_inputs": 100,
+  "latency_repetitions": 3
+}
