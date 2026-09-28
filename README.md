@@ -1,6 +1,6 @@
-# When Text Matters: Design Principles for Visual Token Pruning in Vision-Language Models
+# DeFT: Deferred Text-Guided Visual Token Pruning
 
-Official implementation of **DeFT** (Deferred Text-Guided Visual Token Pruning).
+Code for *When Text Matters: Design Principles for Visual Token Pruning in Vision-Language Models*.
 
 DeFT prunes visual tokens in two stages. Before the language model, visual attention selects a compact set of candidates while preserving a small reserve. At an intermediate decoder layer, text-to-visual attention selects the final tokens. The method requires no training or token merging.
 
@@ -12,9 +12,17 @@ Python 3.11 and a CUDA-capable GPU are required. We recommend a separate environ
 pip install -e '.[eval]'
 ```
 
-Download the model weights separately. The supported checkpoints are Qwen3-VL-4B/8B-Instruct and LLaVA-OneVision-1.5-8B-Instruct.
+For Qwen benchmark evaluation, also install a FlashAttention-2 build compatible
+with your PyTorch and CUDA versions; see [environment details](docs/ENVIRONMENT.md).
+
+## Models and data
+
+Download a checkpoint from [Qwen3-VL-4B](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct), [Qwen3-VL-8B](https://huggingface.co/Qwen/Qwen3-VL-8B-Instruct), or [LLaVA-OneVision-1.5-8B](https://huggingface.co/lmms-lab/LLaVA-OneVision-1.5-8B-Instruct), and pass its local directory as `--model-path`. The eight benchmark download links and preparation steps are in [data setup](docs/DATA.md). We do not redistribute weights or benchmark images.
 
 ## Inference
+
+Run one image and prompt; the answer is printed to the terminal. This quick-start
+example uses SDPA so it does not require FlashAttention-2.
 
 ```bash
 deft-infer \
@@ -30,17 +38,21 @@ deft-infer \
 
 ## Evaluation
 
+Run a benchmark split and save its predictions for scoring. Qwen evaluation
+defaults to FlashAttention-2; LLaVA-OneVision defaults to SDPA. ChartQA and
+InfoVQA are fetched automatically; other tasks may require local data
+preparation as described in [data setup](docs/DATA.md).
+
 ```bash
 deft-eval \
   --task chartqa \
   --family qwen3 \
-  --backend sdpa \
   --model-path /path/to/Qwen3-VL-8B-Instruct \
   --prune 0.8 --alpha 0.2 \
   --output outputs/chartqa.jsonl
 ```
 
-See [data and metrics](docs/DATA.md) for all eight benchmarks, [reproduction settings](docs/REPRODUCIBILITY.md) for the paper experiments, and [method details](docs/METHOD.md) for the implementation. Model weights and benchmark data are not included.
+See [data and metrics](docs/DATA.md) for scoring, [reproduction settings](docs/REPRODUCIBILITY.md) for the paper experiments, and [method details](docs/METHOD.md) for the implementation.
 
 ## Citation
 

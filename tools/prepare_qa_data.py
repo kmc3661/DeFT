@@ -8,8 +8,16 @@ from pathlib import Path
 from datasets import Dataset
 
 
-MMMU_ARROW = None
-AI2D_ARROWS = []
+MMMU_SOURCE = None
+AI2D_SOURCES = []
+
+
+def load_source(path):
+    if path.suffix == ".arrow":
+        return Dataset.from_file(str(path))
+    if path.suffix == ".parquet":
+        return Dataset.from_parquet(str(path))
+    raise ValueError(f"Expected an Arrow or Parquet file: {path}")
 
 
 def write_jsonl(path, rows):
@@ -23,7 +31,7 @@ def prepare_mmmu(output_root):
     output_dir = output_root / "mmmu"
     image_dir = output_dir / "images"
     image_dir.mkdir(parents=True, exist_ok=True)
-    dataset = Dataset.from_file(str(MMMU_ARROW))
+    dataset = load_source(MMMU_SOURCE)
     rows = []
     for doc in dataset:
         options = ast.literal_eval(doc["options"])
@@ -65,7 +73,7 @@ def prepare_ai2d(output_root):
     output_dir = output_root / "ai2d"
     image_dir = output_dir / "images"
     image_dir.mkdir(parents=True, exist_ok=True)
-    datasets = [Dataset.from_file(str(path)) for path in AI2D_ARROWS]
+    datasets = [load_source(path) for path in AI2D_SOURCES]
     rows = []
     index = 0
     for dataset in datasets:
@@ -93,23 +101,23 @@ def prepare_ai2d(output_root):
 
 
 def main():
-    global MMMU_ARROW, AI2D_ARROWS
+    global MMMU_SOURCE, AI2D_SOURCES
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-root", type=Path, default=Path("data"))
     parser.add_argument("--task", choices=["ai2d","mmmu"], required=True)
-    parser.add_argument("--arrow", type=Path, nargs="+", required=True,
-                        help="Official cached Arrow files in original shard order")
+    parser.add_argument("--source", "--arrow", type=Path, nargs="+", required=True,
+                        help="Official Arrow or Parquet files in original shard order")
     args = parser.parse_args()
     if (args.output_root/args.task).exists():
         parser.error("Task output directory already exists; refusing to overwrite")
-    if not all(p.is_file() for p in args.arrow):
-        parser.error("Missing input Arrow file")
+    if not all(p.is_file() and p.suffix in {".arrow", ".parquet"} for p in args.source):
+        parser.error("Missing or unsupported input file (expected Arrow or Parquet)")
     if args.task=="mmmu":
-        if len(args.arrow)!=1:parser.error("MMMU requires one validation Arrow file")
-        MMMU_ARROW=args.arrow[0]
+        if len(args.source)!=1:parser.error("MMMU requires one validation file")
+        MMMU_SOURCE=args.source[0]
         prepare_mmmu(args.output_root)
     else:
-        AI2D_ARROWS=args.arrow
+        AI2D_SOURCES=args.source
         prepare_ai2d(args.output_root)
 
 

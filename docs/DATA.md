@@ -1,12 +1,49 @@
 # Data and metrics
 
+## Benchmark sources
+
 Datasets and images must be acquired separately under their original terms.
 No model output is used to select evaluation examples. Main scores use full sets.
+
+| Task | Source used | Split |
+|---|---|---|
+| TextVQA | [Official TextVQA v0.5.1](https://textvqa.org/dataset/) | Validation annotations and images |
+| MMMU | [lmms-lab/MMMU](https://huggingface.co/datasets/lmms-lab/MMMU) | Validation |
+| AI2D | [lmms-lab/ai2d](https://huggingface.co/datasets/lmms-lab/ai2d) | Test |
+| MMStar | [Lin-Chen/MMStar](https://huggingface.co/datasets/Lin-Chen/MMStar) | `mmstar.parquet` |
+| ChartQA | [lmms-lab/ChartQA](https://huggingface.co/datasets/lmms-lab/ChartQA) | Test |
+| InfoVQA | [lmms-lab/DocVQA](https://huggingface.co/datasets/lmms-lab/DocVQA) | InfographicVQA validation |
+| TextCaps | [lmms-lab/TextCaps](https://huggingface.co/datasets/lmms-lab/TextCaps) | Validation |
+| NoCaps | [lmms-lab/NoCaps](https://huggingface.co/datasets/lmms-lab/NoCaps) | Validation |
+
+`deft-eval` downloads the ChartQA and InfoVQA splits automatically. For
+the two captioning tasks, run `python tools/download_caption_data.py`; it
+downloads only the validation parquet files into the Hugging Face cache.
+The other tasks need local files:
+
+```bash
+hf download lmms-lab/ai2d data/test-00000-of-00002.parquet data/test-00001-of-00002.parquet \
+  --repo-type dataset --local-dir data/raw/ai2d
+python tools/prepare_qa_data.py --task ai2d --output-root data \
+  --source data/raw/ai2d/data/test-00000-of-00002.parquet data/raw/ai2d/data/test-00001-of-00002.parquet
+
+hf download lmms-lab/MMMU data/validation-00000-of-00001.parquet \
+  --repo-type dataset --local-dir data/raw/mmmu
+python tools/prepare_qa_data.py --task mmmu --output-root data \
+  --source data/raw/mmmu/data/validation-00000-of-00001.parquet
+
+hf download Lin-Chen/MMStar mmstar.parquet --repo-type dataset \
+  --local-dir data/mmstar
+```
+
+Pass `--question-file data/ai2d/questions.jsonl --image-folder data/ai2d` for
+AI2D, the corresponding `data/mmmu` paths for MMMU, or
+`--question-file data/mmstar/mmstar.parquet` for MMStar.
 
 | Task | Inputs | Metric | Maximum generated tokens |
 |---|---:|---|---:|
 | TextVQA validation | 5000 | VQA accuracy | 16 |
-| MMMU development | 900 | Accuracy | 32 |
+| MMMU validation | 900 | Accuracy | 32 |
 | AI2D | 3088 | Accuracy | 4 |
 | MMStar | 1500 | Accuracy | 4 |
 | ChartQA test | 2500 | Relaxed accuracy | 16 |
@@ -14,15 +51,21 @@ No model output is used to select evaluation examples. Main scores use full sets
 | TextCaps validation | 3166 | CIDEr | 32 |
 | NoCaps validation | 4500 | CIDEr | 32 |
 
-ChartQA and InfoVQA are loaded through the Hugging Face datasets API. Caption
-inputs use pinned parquet snapshots; run `python tools/download_caption_data.py`
-before caption evaluation. Revisions are recorded in the retained loaders.
-
 For TextVQA supply the canonical JSONL (`question_id`, `text`, `image`) and image
 directory. Keep the official `TextVQA_0.5.1_val.json` annotations beside the question
-file (or its `data/` directory) for reference lookup. Do not prepend OCR tokens.
-Use `python tools/prepare_textvqa.py --annotations /path/to/TextVQA_0.5.1_val.json
---output-dir data/textvqa` to create the no-OCR questions and copy annotations.
+file (or its `data/` directory) for reference lookup. Download the official
+training-image archive (which contains the validation images) and extract it to
+`data/textvqa/train_images`. Do not prepend OCR tokens. Prepare the no-OCR
+questions with:
+
+```bash
+python tools/prepare_textvqa.py \
+  --annotations /path/to/TextVQA_0.5.1_val.json --output-dir data/textvqa
+```
+
+Then pass `--question-file data/textvqa/questions.jsonl --image-folder
+data/textvqa/train_images` to `deft-eval`.
+
 For AI2D/MMMU supply canonical JSONL with `question_id`, `text`, `images` (relative
 paths), `answer`, and optionally `options`/`question_type`. The loader preserves
 MMMU multi-image prompts. MMStar takes its benchmark parquet as `--question-file`.
@@ -32,20 +75,10 @@ them from the official benchmarks, preserve question wording, image order,
 options, splits and answer format. A newly formatted dataset is not automatically
 an exact paper replay. See the retained loader for the precise accepted schema.
 
-`tools/prepare_qa_data.py` preserves the original AI2D/MMMU formatting while
-accepting explicit cached Arrow paths instead of machine-specific directories:
-
-```bash
-python tools/prepare_qa_data.py --task ai2d --output-root data \
-  --arrow /path/to/ai2d-test-00000-of-00002.arrow /path/to/ai2d-test-00001-of-00002.arrow
-python tools/prepare_qa_data.py --task mmmu --output-root data \
-  --arrow /path/to/mmmu-validation.arrow
-```
-
-The original cached source fingerprints were AI2D
-`c83a9b9692933aff8349157c88a413df9d02c4e5` and MMMU
-`364f2e2eb107b36e07ff4c5a15f5947a759cef47`. These are cache fingerprints,
-not necessarily downloadable Git revisions. Verify IDs, counts and prompts.
+`tools/prepare_qa_data.py` accepts either the downloaded Parquet files shown
+above or cached Arrow files, in their original shard order. It preserves the
+AI2D/MMMU prompt formatting. Verify IDs, counts and prompts when preparing
+data from a source other than the linked benchmarks.
 
 Caption prompt: `Output only a concise caption of at most 12 words for the image.`
 Generation is greedy, batch one, cache off. Reference captions are stored only
