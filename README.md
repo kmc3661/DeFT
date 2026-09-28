@@ -2,18 +2,18 @@
 
 Code for *When Text Matters: Design Principles for Visual Token Pruning in Vision-Language Models*.
 
-DeFT prunes visual tokens in two stages. Before the language model, visual attention selects a compact set of candidates while preserving a small reserve. At an intermediate decoder layer, text-to-visual attention selects the final tokens. The method requires no training or token merging.
+DeFT prunes visual tokens in two stages. Before the language model, visual attention selects a compact set of candidates while preserving a small reserve. At an intermediate decoder layer, text-to-visual attention selects the final tokens. The method requires no training or token merging. See [method details](docs/METHOD.md).
 
 ## Installation
 
-Python 3.11 and a CUDA-capable GPU are required. We recommend a separate environment for each model family; see [environment details](docs/ENVIRONMENT.md).
+Python 3.11 and a CUDA-capable GPU are required. See [environment details](docs/ENVIRONMENT.md).
 
 ```bash
 pip install -e '.[eval]'
 ```
 
 For Qwen benchmark evaluation, also install a FlashAttention-2 build compatible
-with your PyTorch and CUDA versions; see [environment details](docs/ENVIRONMENT.md).
+with your PyTorch and CUDA versions.
 
 ## Models and data
 
@@ -41,7 +41,7 @@ deft-infer \
 Run a benchmark split and save its predictions for scoring. Qwen evaluation
 defaults to FlashAttention-2; LLaVA-OneVision defaults to SDPA. ChartQA and
 InfoVQA are fetched automatically; other tasks may require local data
-preparation as described in [data setup](docs/DATA.md).
+preparation.
 
 ```bash
 deft-eval \
@@ -51,8 +51,6 @@ deft-eval \
   --prune 0.8 --alpha 0.2 \
   --output outputs/chartqa.jsonl
 ```
-
-See [data and metrics](docs/DATA.md) for scoring, [reproduction settings](docs/REPRODUCIBILITY.md) for the paper experiments, and [method details](docs/METHOD.md) for the implementation.
 
 ## Citation
 

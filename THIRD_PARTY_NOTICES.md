@@ -3,7 +3,7 @@
 - The internal `vispruner_qwen_ov` compatibility backend and benchmark loaders
   were extracted from the VisPruner-based research tree distributed under
   Apache License 2.0. The license text is retained in `LICENSE`. Public upstream:
-  https://github.com/anonymous-4869/VisPruner (URL recorded in the source README). The extracted research implementation
+  https://github.com/anonymous-4869/VisPruner. The extracted research implementation
   includes subsequent local modifications; it is not claimed to be upstream
   VisPruner or its original algorithm.
 - `_vendor/lmms_qwen3_vl.py` and `_vendor/lmms_llava_onevision1_5.py` are copied
@@ -15,8 +15,5 @@
 - Checkpoint-provided OV code and all model weights/datasets remain under their
   respective upstream licenses and are not included in the archive.
 
-`docs/source_manifest.json` records hashes of the copied source files before
-packaging changes. The principal packaging change to the model backend replaces
-host-specific model-wrapper imports with the included wrappers. Release archives
-contain their own final-file hash manifest. Required upstream attribution is retained. Third-party weights and datasets
-are subject to their own licenses.
+The included upstream code retains its required attribution. Model weights and
+datasets are distributed separately under their respective licenses.
