@@ -1,0 +1,26 @@
+name: Apply DeFT source update
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/apply-deft-update.yml]
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish updated source under repository owner
+        env:
+          GIT_AUTHOR_NAME: Minchan Kang
+          GIT_AUTHOR_EMAIL: 67529114+kmc3661@users.noreply.github.com
+          GIT_COMMITTER_NAME: Minchan Kang
+          GIT_COMMITTER_EMAIL: 67529114+kmc3661@users.noreply.github.com
+        run: |
+          set -euo pipefail
+          unzip -oq deft_update_20260928.zip
+          rm deft_update_20260928.zip .github/workflows/apply-deft-update.yml
+          rmdir .github/workflows .github
+          git add -A
+          git commit -m "Update DeFT data setup and documentation"
+          git push origin HEAD:main
