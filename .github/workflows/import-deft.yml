@@ -1,0 +1,31 @@
+name: Import DeFT source
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/import-deft.yml]
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Publish source under repository owner
+        env:
+          GIT_AUTHOR_NAME: Minchan Kang
+          GIT_AUTHOR_EMAIL: 67529114+kmc3661@users.noreply.github.com
+          GIT_COMMITTER_NAME: Minchan Kang
+          GIT_COMMITTER_EMAIL: 67529114+kmc3661@users.noreply.github.com
+        run: |
+          set -euo pipefail
+          original=$(git rev-parse HEAD)
+          git push origin "$original:refs/heads/import-history"
+          git checkout --orphan clean-main
+          unzip -q deft_github_upload.zip
+          rm deft_github_upload.zip .github/workflows/import-deft.yml
+          rmdir .github/workflows .github
+          git add -A
+          git commit -m "Initial DeFT code release"
+          git push --force-with-lease=refs/heads/main:"$original" origin HEAD:main
