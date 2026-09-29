@@ -50,10 +50,6 @@ deft-eval \
   --output outputs/chartqa.jsonl
 ```
 
-## Citation
-
-Citation details will be added with the arXiv release.
-
 ## License
 
 Released under the [Apache 2.0 license](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md) for included upstream code.
