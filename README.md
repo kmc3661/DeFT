@@ -1,6 +1,6 @@
 # When Text Matters: Design Principles for Visual Token Pruning in Vision-Language Models ([Paper](https://arxiv.org/abs/2609.34861)).
 
-DeFT prunes visual tokens in two stages. Before the language model, visual attention selects a compact set of candidates while preserving a small reserve. At an intermediate decoder layer, text-to-visual attention selects the final tokens. The method requires no training or token merging.
+Deferred text-guided visual token pruning (DeFT) prunes visual tokens in two stages. Before the language model, visual attention selects a compact set of candidates while preserving a small reserve. At an intermediate decoder layer, text-to-visual attention selects the final tokens. The method requires no training or token merging.
 
 ## Installation
 
