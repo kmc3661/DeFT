@@ -50,6 +50,15 @@ deft-eval \
   --output outputs/chartqa.jsonl
 ```
 
+## Citation
+
+@article{kang2026text,
+  title={When Text Matters: Design Principles for Visual Token Pruning in Vision-Language Model},
+  author={Kang, Minchan and Park, Kyeonghye and Cho, Seoyoung and Kim, Daeshik and Cho, Yucheol},
+  journal={arXiv preprint arXiv:2609.34861},
+  year={2026}
+}
+
 ## License
 
 Released under the [Apache 2.0 license](LICENSE). See [third-party notices](THIRD_PARTY_NOTICES.md) for included upstream code.
