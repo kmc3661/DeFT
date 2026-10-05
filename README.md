@@ -52,12 +52,14 @@ deft-eval \
 
 ## Citation
 
+```bibtex
 @article{kang2026text,
   title={When Text Matters: Design Principles for Visual Token Pruning in Vision-Language Model},
   author={Kang, Minchan and Park, Kyeonghye and Cho, Seoyoung and Kim, Daeshik and Cho, Yucheol},
   journal={arXiv preprint arXiv:2609.34861},
   year={2026}
 }
+```
 
 ## License
 
